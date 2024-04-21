@@ -18,10 +18,18 @@ int main() {
   std::vector<int> offset(range,0);
   for (int i=1; i<range; i++) 
     offset[i] = offset[i-1] + bucket[i-1];
+
+  std::vector<int> j(range);
+  std::vector<int> b(range);
+  std::vector<int> key_new(n, -1);
+#pragma omp parallel for
   for (int i=0; i<range; i++) {
-    int j = offset[i];
-    for (; bucket[i]>0; bucket[i]--) {
-      key[j++] = i;
+    j[i] = offset[i];
+    b[i] = bucket[i];
+    bucket[i] = 0;
+    for (int k=0; k<b[i]; k++) {
+      if (key_new[j[i]+k] == -1 || key_new[j[i]+k] < i) 
+        key[j[i]+k] = i;
     }
   }
 
